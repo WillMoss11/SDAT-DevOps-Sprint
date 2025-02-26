@@ -10,9 +10,17 @@ public class Aircraft {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+
+    @NotNull(message = "Type cannot be null")
+    @Size(min = 2, max = 50, message = "Type must be between 2 and 50 characters")
     private String type;
+
+    @NotNull(message = "Airline Name cannot be null")
+    @Size(min = 2, max = 50, message = "Airline Name must be between 2 and 50 characters")
     private String airlineName;
+
+    @Min(value = 1, message = "Number of passengers must be at least 1")
+    @Max(value = 1000, message = "Number of passengers cannot exceed 1000")
     private int numberOfPassengers;
 
     @ManyToMany(mappedBy = "aircraft")

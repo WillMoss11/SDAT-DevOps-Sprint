@@ -3,6 +3,10 @@ package com.example;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RestController
@@ -12,10 +16,11 @@ public class CityController {
     private CityRepository cityRepository;
 
     @GetMapping
-    public List<City> getAllCities() {
-        return cityRepository.findAll();
+    public Page<City> getAllCities(@RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cityRepository.findAll(pageable);
     }
-
     @GetMapping("/{id}")
     public City getCityById(@PathVariable Long id) {
         return cityRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("City not found"));
