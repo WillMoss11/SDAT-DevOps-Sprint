@@ -14,15 +14,8 @@ public class AirportController {
     private CityRepository cityRepository;
 
     @GetMapping
-    public List<AirportDTO> getAllAirports() {
-        List<Airport> airports = airportRepository.findAll();
-        List<AirportDTO> airportDTOs = new ArrayList<>();
-
-        for (Airport airport : airports) {
-            airportDTOs.add(new AirportDTO(airport.getId(), airport.getName(), airport.getCode(), airport.getCity().getName()));
-        }
-
-        return airportDTOs;
+    public List<Airport> getAllAirports() {
+        return airportRepository.findAll();
     }
 
     @GetMapping("/{id}")
