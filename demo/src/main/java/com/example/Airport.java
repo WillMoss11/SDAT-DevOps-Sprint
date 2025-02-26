@@ -10,8 +10,12 @@ public class Airport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+
+    @NotNull(message = "Airport name cannot be null") // Add validation for name
+    @Size(min = 1, max = 100, message = "Airport name must be between 1 and 100 characters")
     private String name;
+
+    @Size(max = 10, message = "Airport code must not exceed 10 characters") // Add validation for code
     private String code;
 
     @ManyToOne

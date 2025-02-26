@@ -26,21 +26,29 @@ public class PassengerController {
     }
 
     @PostMapping
-    public Passenger createPassenger(@RequestBody Passenger passenger, @RequestParam Long cityId) {
+    public Passenger createPassenger(@Valid @RequestBody Passenger passenger, @RequestParam Long cityId, BindingResult result) {
+        if (result.hasErrors()) {
+            // Handle validation errors
+            throw new InvalidDataException("Invalid data provided", result);
+        }
         City city = cityRepository.findById(cityId).orElseThrow(() -> new EntityNotFoundException("City not found"));
         passenger.setCity(city);
         return passengerRepository.save(passenger);
     }
 
     @PutMapping("/{id}")
-    public Passenger updatePassenger(@PathVariable Long id, @RequestBody Passenger passenger, @RequestParam Long cityId) {
-       Passenger existingPassenger = passengerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Passenger not found"));
-       City city = cityRepository.findById(cityId).orElseThrow(() -> new EntityNotFoundException("City not found"));
-       existingPassenger.setFirstName(passenger.getFirstName());
-       existingPassenger.setLastName(passenger.getLastName());
-       existingPassenger.setPhoneNumber(passenger.getPhoneNumber());
-       existingPassenger.setCity(city);
-       return passengerRepository.save(existingPassenger);
+    public Passenger updatePassenger(@PathVariable Long id, @Valid @RequestBody Passenger passenger, @RequestParam Long cityId, BindingResult result) {
+        if (result.hasErrors()) {
+            // Handle validation errors
+            throw new InvalidDataException("Invalid data provided", result);
+        }
+        Passenger existingPassenger = passengerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Passenger not found"));
+        City city = cityRepository.findById(cityId).orElseThrow(() -> new EntityNotFoundException("City not found"));
+        existingPassenger.setFirstName(passenger.getFirstName());
+        existingPassenger.setLastName(passenger.getLastName());
+        existingPassenger.setPhoneNumber(passenger.getPhoneNumber());
+        existingPassenger.setCity(city);
+        return passengerRepository.save(existingPassenger);
     }
 
     @DeleteMapping("/{id}")
