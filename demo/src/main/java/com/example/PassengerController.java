@@ -3,6 +3,10 @@ package com.example;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RestController
@@ -16,8 +20,10 @@ public class PassengerController {
     private AircraftRepository aircraftRepository;
 
     @GetMapping
-    public List<Passenger> getAllPassengers() {
-        return passengerRepository.findAll();
+    public Page<Passenger> getAllPassengers(@RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return passengerRepository.findAll(pageable);
     }
 
     @GetMapping("/{id}")
@@ -26,21 +32,29 @@ public class PassengerController {
     }
 
     @PostMapping
-    public Passenger createPassenger(@RequestBody Passenger passenger, @RequestParam Long cityId) {
+    public Passenger createPassenger(@Valid @RequestBody Passenger passenger, @RequestParam Long cityId, BindingResult result) {
+        if (result.hasErrors()) {
+            // Handle validation errors
+            throw new InvalidDataException("Invalid data provided", result);
+        }
         City city = cityRepository.findById(cityId).orElseThrow(() -> new EntityNotFoundException("City not found"));
         passenger.setCity(city);
         return passengerRepository.save(passenger);
     }
 
     @PutMapping("/{id}")
-    public Passenger updatePassenger(@PathVariable Long id, @RequestBody Passenger passenger, @RequestParam Long cityId) {
-       Passenger existingPassenger = passengerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Passenger not found"));
-       City city = cityRepository.findById(cityId).orElseThrow(() -> new EntityNotFoundException("City not found"));
-       existingPassenger.setFirstName(passenger.getFirstName());
-       existingPassenger.setLastName(passenger.getLastName());
-       existingPassenger.setPhoneNumber(passenger.getPhoneNumber());
-       existingPassenger.setCity(city);
-       return passengerRepository.save(existingPassenger);
+    public Passenger updatePassenger(@PathVariable Long id, @Valid @RequestBody Passenger passenger, @RequestParam Long cityId, BindingResult result) {
+        if (result.hasErrors()) {
+            // Handle validation errors
+            throw new InvalidDataException("Invalid data provided", result);
+        }
+        Passenger existingPassenger = passengerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Passenger not found"));
+        City city = cityRepository.findById(cityId).orElseThrow(() -> new EntityNotFoundException("City not found"));
+        existingPassenger.setFirstName(passenger.getFirstName());
+        existingPassenger.setLastName(passenger.getLastName());
+        existingPassenger.setPhoneNumber(passenger.getPhoneNumber());
+        existingPassenger.setCity(city);
+        return passengerRepository.save(existingPassenger);
     }
 
     @DeleteMapping("/{id}")

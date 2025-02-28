@@ -10,19 +10,29 @@ public class Passenger {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
+
+    @NotNull(message = "First name cannot be null") // Add validation for firstName
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     private String firstName;
+
+    @NotNull(message = "Last name cannot be null") // Add validation for lastName
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
+
+    @NotNull(message = "Phone number cannot be null") // Add validation for phoneNumber
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Phone number must be between 10 and 15 digits")
     private String phoneNumber;
 
+    @NotNull(message = "City cannot be null")
     @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
 
+    @NotEmpty(message = "Passenger must be assigned to at least one aircraft")
     @ManyToMany
     @JoinTable(name = "passenger_aircraft",
-               joinColumns = @JoinColumn(name = "passenger_id"),
-               inverseJoinColumns = @JoinColumn(name = "aircraft_id"))
+            joinColumns = @JoinColumn(name = "passenger_id"),
+            inverseJoinColumns = @JoinColumn(name = "aircraft_id"))
     private List<Aircraft> aircraft = new ArrayList<>();
 
     public Long getId() { return id; }
